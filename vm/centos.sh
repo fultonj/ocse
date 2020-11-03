@@ -36,21 +36,23 @@ if [[ ! $(sudo ls /var/lib/libvirt/images/$IMG) ]]; then
     # to download newer image run 'sudo rm /var/lib/libvirt/images/$IMG'
 fi
 # -------------------------------------------------------
-if [[ ! $(sudo virsh net-list | grep storage) ]]; then
-    BR_NAME=storage
-    MAC=52:54:00:e5:01:43
-    echo "Creating virtual bridge $BR_NAME"
+if [[ ! $(sudo virsh net-list | grep ospnetwork) ]]; then
+    echo "The ospnetwork should have been created by openstack-k8s-operators/dev-tools"
+    exit 1
+    # BR_NAME=ospnetwork
+    # MAC=52:54:00:e5:01:43
+    # echo "Creating virtual bridge $BR_NAME"
     
-    cat /dev/null > /tmp/net.xml
-    echo "<network>" >> /tmp/net.xml
-    echo "<name>$BR_NAME</name>" >> /tmp/net.xml
-    echo "<bridge name='$BR_NAME' stp='off' delay='0'/>" >> /tmp/net.xml
-    echo "<mac address='$MAC'/>" >> /tmp/net.xml
-    echo "</network>" >> /tmp/net.xml
+    # cat /dev/null > /tmp/net.xml
+    # echo "<network>" >> /tmp/net.xml
+    # echo "<name>$BR_NAME</name>" >> /tmp/net.xml
+    # echo "<bridge name='$BR_NAME' stp='off' delay='0'/>" >> /tmp/net.xml
+    # echo "<mac address='$MAC'/>" >> /tmp/net.xml
+    # echo "</network>" >> /tmp/net.xml
     
-    sudo virsh net-define /tmp/net.xml
-    sudo virsh net-start $BR_NAME
-    sudo virsh net-autostart $BR_NAME
+    # sudo virsh net-define /tmp/net.xml
+    # sudo virsh net-start $BR_NAME
+    # sudo virsh net-autostart $BR_NAME
 fi
 # -------------------------------------------------------
 if [[ -e /var/lib/libvirt/images/$NAME.qcow2 ]]; then
@@ -94,7 +96,7 @@ sudo virt-customize -a $NAME.qcow2 --run-command "mkdir /root/.ssh/; chmod 700 /
 popd
 
 # -------------------------------------------------------
-sudo virt-install --ram $RAM --vcpus $CPU --os-variant centos8 --disk path=/var/lib/libvirt/images/$NAME.qcow2,device=disk,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network network:storage --network network:default --name $NAME
+sudo virt-install --ram $RAM --vcpus $CPU --os-variant centos8 --disk path=/var/lib/libvirt/images/$NAME.qcow2,device=disk,bus=virtio,format=qcow2 --import --noautoconsole --vnc --network network:ospnetwork --network network:default --name $NAME
 sleep 10
 if [[ ! $(sudo virsh list | grep $NAME) ]]; then
     echo "Cannot find new $NAME; Exiting."

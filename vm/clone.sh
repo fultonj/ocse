@@ -67,13 +67,13 @@ for i in $(seq 0 $(( $NUMBER - 1 )) ); do
     if [[ $STORAGE_NET -eq 1 ]]; then
         FINAL_OCTET=$(($i+2))
         cat > /tmp/storage_net <<EOF
-if [[ \$(ip a s eth0 | grep 172.16.11 | wc -l) -eq 0 ]]; then
+if [[ \$(ip a s eth0 | grep 192.168.25 | wc -l) -eq 0 ]]; then
    echo "Bringing up eth0"
    cat /dev/null > /tmp/eth0
    echo "DEVICE=eth0" >> /tmp/eth0
    echo "ONBOOT=yes" >> /tmp/eth0
    echo "TYPE=Ethernet" >> /tmp/eth0
-   echo "IPADDR=172.16.11.$FINAL_OCTET" >> /tmp/eth0
+   echo "IPADDR=192.168.25.$FINAL_OCTET" >> /tmp/eth0
    echo "PREFIX=24" >> /tmp/eth0
    sudo mv /tmp/eth0 /etc/sysconfig/network-scripts/ifcfg-eth0
    sudo chcon system_u:object_r:net_conf_t:s0 /etc/sysconfig/network-scripts/ifcfg-eth0
